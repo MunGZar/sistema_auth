@@ -11,12 +11,15 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { DeactivateUserDto } from './dto/desactivate-user.dto';
 import { AuditLog } from '../../entities/audit-log.entity';
 import * as bcrypt from 'bcrypt';
+import { AuditService } from '../audit/audit.service';
+
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepo: Repository<User>,
     @InjectRepository(AuditLog) private auditRepo: Repository<AuditLog>,
+    private readonly auditService: AuditService,
   ) {}
 
   async create(dto: CreateUserDto, actor: string) {

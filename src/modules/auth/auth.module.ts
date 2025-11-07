@@ -9,10 +9,12 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { User } from '../../entities/user.entity';
 import { AuditLog } from '../../entities/audit-log.entity';
 import { UsersModule } from '../user/user.module';
+import { AuditModule } from '../audit/audit.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, AuditLog]),
+    AuditModule,
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'default-secret',
