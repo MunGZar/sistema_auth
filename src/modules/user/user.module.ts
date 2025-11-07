@@ -9,5 +9,6 @@ import { AuditLog } from '../../entities/audit-log.entity';
   imports: [TypeOrmModule.forFeature([User, AuditLog])],
   controllers: [UsersController],
   providers: [UsersService],
+  exports: [UsersService],
 })
 export class UsersModule {}

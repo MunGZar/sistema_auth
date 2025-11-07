@@ -6,6 +6,8 @@ import { User } from './entities/user.entity';
 import { RecoveryCode } from './entities/recovery-code.entity';
 import { AuditLog } from './entities/audit-log.entity';
 import { UsersModule } from './modules/user/user.module';
+import { AuthModule } from './modules/auth/auth.module';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -19,7 +21,8 @@ import { UsersModule } from './modules/user/user.module';
       synchronize: false, 
       logging: true,
     }),
-    UsersModule
+    UsersModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
