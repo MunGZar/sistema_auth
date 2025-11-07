@@ -27,4 +27,3 @@ import { UsersModule } from '../user/user.module';
   exports: [AuthService, JwtAuthGuard],
 })
 export class AuthModule {}
-

@@ -495,9 +495,65 @@ Authorization: Bearer <token-del-login>
 
 ---
 
-## 📝 Notas para Compañeros
+### 📝 Notas para Compañeros
 
 1. **No modificar user.service.ts**: El módulo auth usa `UsersService` pero no lo modifica
+
+---
+
+## 🧪 Testing y Calidad
+
+### Tests Disponibles
+
+El módulo auth cuenta con tests unitarios y de integración:
+
+- **Tests Unitarios**: `src/modules/auth/**/*.spec.ts`
+  - Controller
+  - Service
+  - Guards
+  - Strategies
+
+- **Tests e2e**: `test/auth.e2e-spec.ts`
+  - Pruebas de integración
+  - No requiere base de datos (usa mocks)
+
+### Comandos de Testing
+
+```bash
+# Ejecutar TODOS los tests
+npm test
+
+# Solo tests del módulo auth
+npm run test:auth
+
+# Tests e2e (sin BD, usa mocks)
+npm run test:e2e:mock
+
+# Ver cobertura de código
+npm run test:cov
+```
+
+### Modo Desarrollo
+
+```bash
+# Re-ejecuta tests al guardar cambios
+npm run test:watch
+
+# Permite usar debugger
+npm run test:debug
+```
+
+### Tests Específicos
+
+```bash
+# Un archivo específico
+npx jest src/modules/auth/auth.controller.spec.ts
+
+# Tests que contengan "login"
+npx jest -t "login"
+```
+
+Para más detalles sobre testing, ver: [TESTING.md](TESTING.md)
 2. **Normalización**: Solo se normaliza en login, no en registro (UsersService maneja eso)
 3. **Auditoría**: Los eventos `login_ok` y `login_fail` se registran automáticamente
 4. **JWT**: El secret debe estar en `.env` en producción (nunca usar 'default-secret')

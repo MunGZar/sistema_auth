@@ -22,7 +22,10 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:auth": "jest modules/auth",
+    "test:e2e:mock": "jest --config ./test/jest-e2e.json test/auth.e2e-spec.ts --runInBand",
+    "postman:auth": "newman run postman/Auth_Collection.json --env-var \"base_url=http://localhost:3000\" --reporters cli,html --reporter-html-export ./postman/report.html"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

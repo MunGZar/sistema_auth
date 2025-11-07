@@ -57,10 +57,7 @@ export class AuthService {
 
     // Buscar usuario por email o nombreUsuario
     const user = await this.usersRepository.findOne({
-      where: [
-        { email: emailOrUsername },
-        { nombreUsuario: emailOrUsername },
-      ],
+      where: [{ email: emailOrUsername }, { nombreUsuario: emailOrUsername }],
     });
 
     if (!user) {
@@ -144,4 +141,3 @@ export class AuthService {
     return userWithoutPassword;
   }
 }
-
