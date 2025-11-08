@@ -1,24 +1,19 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
-@Entity()
+@Entity('audit_logs')
 export class AuditLog {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  actor: string; // usuario/admin que hizo el cambio
+  actor: string; // Usuario o admin que ejecutó la acción
 
   @Column()
-  action: string; // tipo de acción (crear, actualizar, desactivar)
+  action: string; // Tipo de acción (crear, actualizar, desactivar)
 
-  @Column()
-  motivo: string;
+  @Column({ nullable: true })
+  motivo: string; // Motivo o razón del cambio
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
 }

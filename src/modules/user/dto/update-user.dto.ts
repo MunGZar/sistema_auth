@@ -1,14 +1,12 @@
-import { IsEmail, IsOptional, MinLength } from 'class-validator';
+import { IsOptional, IsString, MinLength } from 'class-validator';
 
 export class UpdateUserDto {
   @IsOptional()
-  nombreUsuario?: string;
+  @IsString({ message: 'El apellido debe ser una cadena de texto' })
+  apellido?: string;
 
   @IsOptional()
-  @IsEmail()
-  email?: string;
-
-  @IsOptional()
-  @MinLength(6)
-  password?: string;
+  @IsString({ message: 'El motivo debe ser una cadena de texto' })
+  @MinLength(5, { message: 'El motivo debe tener al menos 5 caracteres' })
+  motivo?: string;
 }
