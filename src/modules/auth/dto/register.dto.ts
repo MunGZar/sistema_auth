@@ -8,6 +8,14 @@ import {
 } from 'class-validator';
 
 export class RegisterDto {
+  @IsNotEmpty({ message: 'El nombre es requerido' })
+  @IsString({ message: 'El nombre debe ser una cadena de texto' })
+  nombre: string;
+
+  @IsNotEmpty({ message: 'El apellido es requerido' })
+  @IsString({ message: 'El apellido debe ser una cadena de texto' })
+  apellido: string;
+
   @IsNotEmpty({ message: 'El nombre de usuario es requerido' })
   @IsString({ message: 'El nombre de usuario debe ser una cadena de texto' })
   @MinLength(3, {

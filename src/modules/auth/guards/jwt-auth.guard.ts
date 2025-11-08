@@ -39,10 +39,9 @@ export class JwtAuthGuard implements CanActivate {
         throw new UnauthorizedException('Usuario no encontrado');
       }
 
-      if (user.status !== UserStatus.ACTIVE) {
-        throw new UnauthorizedException('Usuario desactivado');
-      }
-
+          if (user.estado !== UserStatus.ACTIVE) {
+            throw new UnauthorizedException('Usuario desactivado');
+          }
       // Adjuntar el usuario al request para uso en los controladores
       request.user = user;
       return true;

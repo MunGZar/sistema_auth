@@ -8,12 +8,14 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { User } from '../../entities/user.entity';
 import { AuditLog } from '../../entities/audit-log.entity';
+import { RecoveryCode } from '../../entities/recovery-code.entity';
 import { UsersModule } from '../user/user.module';
 import { AuditModule } from '../audit/audit.module';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, AuditLog]),
+    TypeOrmModule.forFeature([User, AuditLog, RecoveryCode]),
     AuditModule,
     PassportModule,
     JwtModule.register({
@@ -23,6 +25,7 @@ import { AuditModule } from '../audit/audit.module';
       },
     }),
     UsersModule,
+    EmailModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtAuthGuard],

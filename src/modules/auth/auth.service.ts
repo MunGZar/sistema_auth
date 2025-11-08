@@ -9,10 +9,13 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { User, UserStatus, UserRole } from '../../entities/user.entity';
 import { AuditLog } from '../../entities/audit-log.entity';
+import { RecoveryCode } from '../../entities/recovery-code.entity';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtPayload } from './strategies/jwt.strategy';
 import { UsersService } from '../user/user.service';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class AuthService {
@@ -21,8 +24,11 @@ export class AuthService {
     private readonly usersRepository: Repository<User>,
     @InjectRepository(AuditLog)
     private readonly auditRepository: Repository<AuditLog>,
+    @InjectRepository(RecoveryCode)
+    private readonly recoveryCodeRepository: Repository<RecoveryCode>,
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
+    private readonly emailService: EmailService,
   ) {}
 
   /**
@@ -30,21 +36,19 @@ export class AuthService {
    */
   async register(registerDto: RegisterDto) {
     // Usar UsersService para crear el usuario
-    const user = await this.usersService.create(
-      {
-        nombreUsuario: registerDto.nombreUsuario,
-        email: registerDto.email,
-        password: registerDto.password,
-        role: UserRole.USER,
-      },
-      registerDto.nombreUsuario,
-    );
+    const user = await this.usersService.create({
+      nombre: registerDto.nombre,
+      apellido: registerDto.apellido,
+      nombreUsuario: registerDto.nombreUsuario,
+      email: registerDto.email,
+      contraseña: registerDto.password,
+    });
 
-    // TODO: Llamar a EmailService para enviar correo de bienvenida
-    // await this.emailService.sendWelcomeEmail(user);
+    // Enviar correo de bienvenida
+    await this.emailService.sendWelcomeEmail(user);
 
     // Retornar usuario sin contraseña
-    const { password, ...userWithoutPassword } = user;
+    const { contraseña, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
@@ -71,7 +75,7 @@ export class AuthService {
     }
 
     // Verificar estado activo
-    if (user.status !== UserStatus.ACTIVE) {
+    if (user.estado !== UserStatus.ACTIVE) {
       await this.auditRepository.save({
         actor: user.nombreUsuario,
         action: 'login_fail',
@@ -83,7 +87,7 @@ export class AuthService {
     // Verificar contraseña
     const isPasswordValid = await bcrypt.compare(
       loginDto.password,
-      user.password,
+      user.contraseña,
     );
 
     if (!isPasswordValid) {
@@ -100,7 +104,7 @@ export class AuthService {
     const payload: JwtPayload = {
       userId: user.id,
       role: user.role,
-      status: user.status,
+      status: user.estado,
     };
 
     const accessToken = this.jwtService.sign(payload);
@@ -119,7 +123,7 @@ export class AuthService {
         nombreUsuario: user.nombreUsuario,
         email: user.email,
         role: user.role,
-        status: user.status,
+        status: user.estado,
       },
     };
   }
@@ -137,7 +141,70 @@ export class AuthService {
     }
 
     // Retornar todos los datos excepto la contraseña
-    const { password, ...userWithoutPassword } = user;
+    const { contraseña, ...userWithoutPassword } = user;
     return userWithoutPassword;
+  }
+
+  /**
+   * Solicitar código de recuperación de contraseña
+   */
+  async requestPasswordReset(email: string) {
+    const user = await this.usersRepository.findOne({ where: { email } });
+
+    // Falla silenciosamente si el usuario no existe para evitar enumeración de usuarios
+    if (!user) {
+      return;
+    }
+
+    // Generar código de 6 dígitos
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Establecer fecha de expiración (2 minutos desde ahora)
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 2);
+
+    // Guardar el código de recuperación
+    const recoveryCode = this.recoveryCodeRepository.create({
+      user,
+      code,
+      expiresAt,
+    });
+    await this.recoveryCodeRepository.save(recoveryCode);
+
+    // Enviar el correo electrónico
+    await this.emailService.sendPasswordResetEmail(user, code);
+  }
+
+  /**
+   * Resetea la contraseña usando un código de recuperación válido
+   */
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    const { code, password } = resetPasswordDto;
+
+    const recoveryCode = await this.recoveryCodeRepository.findOne({
+      where: { code },
+      relations: ['user'],
+    });
+
+    if (!recoveryCode) {
+      throw new BadRequestException('El código de recuperación es inválido.');
+    }
+
+    if (recoveryCode.used) {
+      throw new BadRequestException('Este código ya ha sido utilizado.');
+    }
+
+    if (recoveryCode.expiresAt < new Date()) {
+      throw new BadRequestException('El código de recuperación ha expirado.');
+    }
+
+    // El código es válido, hashear la nueva contraseña y actualizar el usuario
+    const user = recoveryCode.user;
+    user.contraseña = await bcrypt.hash(password, 10);
+    await this.usersRepository.save(user);
+
+    // Marcar el código como usado
+    recoveryCode.used = true;
+    await this.recoveryCodeRepository.save(recoveryCode);
   }
 }
