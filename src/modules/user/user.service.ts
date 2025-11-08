@@ -1,88 +1,48 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, UserStatus } from '../../entities/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { DeactivateUserDto } from './dto/desactivate-user.dto';
-import { AuditLog } from '../../entities/audit-log.entity';
 import * as bcrypt from 'bcrypt';
-import { AuditService } from '../audit/audit.service';
-
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private usersRepo: Repository<User>,
-    @InjectRepository(AuditLog) private auditRepo: Repository<AuditLog>,
-    private readonly auditService: AuditService,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
   ) {}
 
-  async create(dto: CreateUserDto, actor: string) {
-    const exists = await this.usersRepo.findOne({
-      where: [{ email: dto.email }, { nombreUsuario: dto.nombreUsuario }],
-    });
-    if (exists) throw new BadRequestException('El usuario o email ya existe');
-
-    const user = this.usersRepo.create({
-      ...dto,
-      password: await bcrypt.hash(dto.password, 10),
-    });
-    await this.usersRepo.save(user);
-
-    await this.auditRepo.save({
-      actor,
-      action: 'create',
-      motivo: `Creación del usuario ${user.nombreUsuario}`,
-    });
-
-    return user;
+  async create(data: Partial<User>) {
+    if (!data.nombre || !data.email || !data.contraseña) {
+      throw new Error('Nombre, email y contraseña son requeridos');
+    }
+    
+    data.nombreUsuario = data.nombre.trim().toLowerCase();
+    data.email = data.email.trim().toLowerCase();
+    data.contraseña = await bcrypt.hash(data.contraseña, 10) as string;
+    const user = this.userRepo.create(data);
+    return this.userRepo.save(user);
   }
 
   findAll() {
-    return this.usersRepo.find();
+    return this.userRepo.find();
   }
 
   async findOne(id: number) {
-    const user = await this.usersRepo.findOne({ where: { id } });
+    const user = await this.userRepo.findOne({ where: { id } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
     return user;
   }
 
-  async update(id: number, dto: UpdateUserDto, actor: string) {
+  async update(id: number, data: Partial<User>) {
     const user = await this.findOne(id);
-
-    if (dto.password) {
-      dto.password = await bcrypt.hash(dto.password, 10);
-    }
-
-    Object.assign(user, dto);
-    await this.usersRepo.save(user);
-
-    await this.auditRepo.save({
-      actor,
-      action: 'update',
-      motivo: `Actualización del usuario ${user.nombreUsuario}`,
-    });
-
-    return user;
+    Object.assign(user, data);
+    return this.userRepo.save(user);
   }
 
-  async deactivate(id: number, dto: DeactivateUserDto, actor: string) {
+  async deactivate(id: number, motivo: string) {
     const user = await this.findOne(id);
-    user.status = UserStatus.INACTIVE;
-    await this.usersRepo.save(user);
-
-    await this.auditRepo.save({
-      actor,
-      action: 'deactivate',
-      motivo: dto.motivo,
-    });
-
-    return { message: 'Usuario desactivado', user };
+    user.estado = UserStatus.INACTIVE;
+    // Aquí podrías registrar en audit_logs el motivo
+    return this.userRepo.save(user);
   }
 }

@@ -1,5 +1,5 @@
-import { AppDataSource } from '../data-source';
-import { User, UserRole } from '../entities/user.entity';
+import { AppDataSource } from '../src/data-source';
+import { User, UserRole } from '../src/entities/user.entity';
 import * as bcrypt from 'bcrypt';
 
 async function runSeed() {
@@ -11,23 +11,29 @@ async function runSeed() {
   const userPassword = await bcrypt.hash('User123*', 10);
 
   const admin = userRepo.create({
+    nombre: 'Admin',
+    apellido: 'System',
     nombreUsuario: 'admin',
     email: 'admin@mail.com',
-    password: adminPassword,
+    contraseña: adminPassword,
     role: UserRole.ADMIN,
   });
 
   const user1 = userRepo.create({
+    nombre: 'Carlos',
+    apellido: 'Pérez',
     nombreUsuario: 'carlos',
     email: 'carlos@mail.com',
-    password: userPassword,
+    contraseña: userPassword,
     role: UserRole.USER,
   });
 
   const user2 = userRepo.create({
+    nombre: 'Laura',
+    apellido: 'García',
     nombreUsuario: 'laura',
     email: 'laura@mail.com',
-    password: userPassword,
+    contraseña: userPassword,
     role: UserRole.USER,
   });
 

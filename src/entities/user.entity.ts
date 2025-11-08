@@ -7,8 +7,8 @@ import {
 } from 'typeorm';
 
 export enum UserRole {
-  USER = 'user',
   ADMIN = 'admin',
+  USER = 'user',
 }
 
 export enum UserStatus {
@@ -21,6 +21,12 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
+  nombre: string;
+
+  @Column()
+  apellido: string;
+
   @Column({ unique: true })
   nombreUsuario: string;
 
@@ -28,7 +34,7 @@ export class User {
   email: string;
 
   @Column()
-  password: string;
+  contraseña: string;
 
   @Column({
     type: 'enum',
@@ -42,7 +48,7 @@ export class User {
     enum: UserStatus,
     default: UserStatus.ACTIVE,
   })
-  status: UserStatus;
+  estado: UserStatus;
 
   @CreateDateColumn()
   createdAt: Date;
