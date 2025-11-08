@@ -12,10 +12,12 @@ describe('JwtStrategy', () => {
   const mockUser: User = {
     id: 1,
     nombreUsuario: 'testuser',
+    nombre: 'NombreTest',
+    apellido: 'ApellidoTest',
     email: 'test@example.com',
-    password: 'hashedPassword',
+    contraseña: 'hashedPassword',
     role: UserRole.USER,
-    status: UserStatus.ACTIVE,
+    estado: UserStatus.ACTIVE,
     createdAt: new Date(),
     updatedAt: new Date(),
   };

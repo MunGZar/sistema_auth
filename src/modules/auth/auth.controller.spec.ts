@@ -12,10 +12,13 @@ describe('AuthController', () => {
 
   const mockUser = {
     id: 1,
+    nombre: 'Test',
+    apellido: 'User',
     nombreUsuario: 'testuser',
     email: 'test@example.com',
+    contraseña: 'hashedPassword',
     role: UserRole.USER,
-    status: UserStatus.ACTIVE,
+    estado: UserStatus.ACTIVE,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
