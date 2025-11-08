@@ -64,16 +64,14 @@ export class EmailService {
   async sendWelcomeEmail(user: User) {
     console.log(`Intentando enviar correo de bienvenida a: ${user.email}`);
 
-    const templatePath = path.join(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      'modules',
-      'auth',
-      'templates',
-      'welcome.hbs',
-    );
+const templatePath = path.join(
+  process.cwd(), 
+  'src',         
+  'modules',
+  'auth',
+  'templates',
+  'welcom.hbs',
+);
     const source = fs.readFileSync(templatePath, 'utf-8').toString();
     
     const mailOptions = {
@@ -120,11 +118,10 @@ export class EmailService {
     console.log(`Intentando enviar correo de recuperación a: ${user.email}`);
     
     const templatePath = path.join(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      'modules',
+      __dirname, // 1. Estamos en: /home/.../sistema_auth/src/modules/email
+      '..',      // 2. Subimos a: /home/.../sistema_auth/src/modules
+      '..',      // 3. Subimos a: /home/.../sistema_auth/src
+      'modules', // 4. Entramos a: /home/.../sistema_auth/src/modules
       'auth',
       'templates',
       'reset-password.hbs',
