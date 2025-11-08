@@ -5,7 +5,9 @@ import {
   MinLength,
   Matches,
   MaxLength,
+  IsEnum,
 } from 'class-validator';
+import { UserRole } from '../../../entities/user.entity';
 
 export class RegisterDto {
   @IsNotEmpty({ message: 'El nombre es requerido' })
@@ -37,4 +39,7 @@ export class RegisterDto {
       'La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial',
   })
   password: string;
+
+    @IsEnum(UserRole, { message: 'El rol debe ser "admin" o "user"' })
+    role: UserRole;
 }
