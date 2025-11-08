@@ -29,11 +29,13 @@ describe('AuthService', () => {
     id: 1,
     nombreUsuario: 'testuser',
     email: 'test@example.com',
-    password: 'hashedPassword123',
+    contraseña: 'hashedPassword123',
     role: UserRole.USER,
-    status: UserStatus.ACTIVE,
+    estado: UserStatus.ACTIVE,
     createdAt: new Date(),
     updatedAt: new Date(),
+    nombre: 'Test',
+    apellido: 'User'
   };
 
   const mockRegisterDto: RegisterDto = {
@@ -157,12 +159,12 @@ describe('AuthService', () => {
       });
       expect(bcrypt.compare).toHaveBeenCalledWith(
         mockLoginDto.password,
-        mockUser.password,
+        mockUser.contraseña,
       );
       expect(jwtService.sign).toHaveBeenCalledWith({
         userId: mockUser.id,
         role: mockUser.role,
-        status: mockUser.status,
+        status: mockUser.estado,
       });
       expect(result).toHaveProperty('accessToken');
       expect(result).toHaveProperty('user');
@@ -215,7 +217,7 @@ describe('AuthService', () => {
       expect(jwtService.sign).toHaveBeenCalledWith({
         userId: mockUser.id,
         role: mockUser.role,
-        status: mockUser.status,
+        status: mockUser.estado,
       });
     });
 

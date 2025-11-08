@@ -30,21 +30,19 @@ export class AuthService {
    */
   async register(registerDto: RegisterDto) {
     // Usar UsersService para crear el usuario
-    const user = await this.usersService.create(
-      {
-        nombreUsuario: registerDto.nombreUsuario,
-        email: registerDto.email,
-        password: registerDto.password,
-        role: UserRole.USER,
-      },
-      registerDto.nombreUsuario,
-    );
+    const user = await this.usersService.create({
+      nombre: registerDto.nombreUsuario,
+      nombreUsuario: registerDto.nombreUsuario,
+      email: registerDto.email,
+      contraseña: registerDto.password,
+      role: UserRole.USER,
+    });
 
     // TODO: Llamar a EmailService para enviar correo de bienvenida
     // await this.emailService.sendWelcomeEmail(user);
 
     // Retornar usuario sin contraseña
-    const { password, ...userWithoutPassword } = user;
+    const { contraseña, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
@@ -71,7 +69,7 @@ export class AuthService {
     }
 
     // Verificar estado activo
-    if (user.status !== UserStatus.ACTIVE) {
+    if (user.estado !== UserStatus.ACTIVE) {
       await this.auditRepository.save({
         actor: user.nombreUsuario,
         action: 'login_fail',
@@ -83,7 +81,7 @@ export class AuthService {
     // Verificar contraseña
     const isPasswordValid = await bcrypt.compare(
       loginDto.password,
-      user.password,
+      user.contraseña,
     );
 
     if (!isPasswordValid) {
@@ -100,7 +98,7 @@ export class AuthService {
     const payload: JwtPayload = {
       userId: user.id,
       role: user.role,
-      status: user.status,
+      status: user.estado,
     };
 
     const accessToken = this.jwtService.sign(payload);
@@ -119,7 +117,7 @@ export class AuthService {
         nombreUsuario: user.nombreUsuario,
         email: user.email,
         role: user.role,
-        status: user.status,
+        status: user.estado,
       },
     };
   }
@@ -137,7 +135,7 @@ export class AuthService {
     }
 
     // Retornar todos los datos excepto la contraseña
-    const { password, ...userWithoutPassword } = user;
+    const { contraseña, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 }

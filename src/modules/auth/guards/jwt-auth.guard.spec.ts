@@ -13,11 +13,13 @@ describe('JwtAuthGuard', () => {
 
   const mockUser: User = {
     id: 1,
+    nombre: 'Test',
+    apellido: 'User',
     nombreUsuario: 'testuser',
     email: 'test@example.com',
-    password: 'hashedPassword',
+    contraseña: 'hashedPassword',
     role: UserRole.USER,
-    status: UserStatus.ACTIVE,
+    estado: UserStatus.ACTIVE,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
