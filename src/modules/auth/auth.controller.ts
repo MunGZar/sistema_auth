@@ -29,7 +29,7 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
-  @Post('request-password-reset')
+  @Post('recuperar-contrasena')
   @HttpCode(HttpStatus.OK)
   async requestPasswordReset(
     @Body() requestPasswordResetDto: RequestPasswordResetDto,
@@ -41,7 +41,7 @@ export class AuthController {
     };
   }
 
-  @Post('reset-password')
+  @Post('actualizar-contrasena')
   @HttpCode(HttpStatus.OK)
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     await this.authService.resetPassword(resetPasswordDto);

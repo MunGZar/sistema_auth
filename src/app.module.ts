@@ -1,4 +1,4 @@
-import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common'; // agregado MiddlewareConsumer y NestModule
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { User } from './entities/user.entity';
@@ -7,7 +7,7 @@ import { AuditLog } from './entities/audit-log.entity';
 import { UsersModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { EmailModule } from './modules/email/email.module';
-import { LoggerMiddleware } from './middleware/logger.middleware'; // agregado
+import { LoggerMiddleware } from './middleware/logger.middleware';
 
 @Module({
   imports: [
@@ -32,8 +32,6 @@ import { LoggerMiddleware } from './middleware/logger.middleware'; // agregado
   ],
 })
 export class AppModule implements NestModule {
-  //  implementa NestModule
-
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*'); //  aplica el middleware globalmente
   }
